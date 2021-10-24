@@ -23,7 +23,8 @@ type DBConfig struct {
 }
 
 type ServerConfig struct {
-	Port string
+	Port        string
+	ApiBasePath string
 }
 
 func Load() *Config {
@@ -41,7 +42,8 @@ func Load() *Config {
 			Port:     envConfig["DB_PORT"],
 		},
 		ServerConfig: ServerConfig{
-			Port: envConfig["SERVER_PORT"],
+			Port:        envConfig["SERVER_PORT"],
+			ApiBasePath: "api",
 		},
 	}
 

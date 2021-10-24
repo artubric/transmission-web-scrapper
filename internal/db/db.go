@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	dBName               = "TransmissionWebScrapper"
+	dBName               = "TransmissionWebScrapper" // TODO: config?
 	seasonCollectionName = "Season"
 	sourceCollectionName = "Source"
-	timeout              = 10 * time.Second
+	timeout              = 10 * time.Second // TODO: config?
 )
 
 type DBRepositories struct {
@@ -36,11 +36,19 @@ func Connect(config config.DBConfig) *DBRepositories {
 	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		log.Fatal("Failed to connect to DB with %+w", err)
 	}
+
+	dbRepositories := setupRepositories(client)
+
+	return &dbRepositories
+
+}
+
+func setupRepositories(client *mongo.Client) DBRepositories {
 	seasonCollection := client.Database(dBName).Collection(seasonCollectionName)
 	sourceCollection := client.Database(dBName).Collection(sourceCollectionName)
 	seasonRepository := NewSeasonRepository(seasonCollection)
 	sourceRepository := NewDataSourceRepository(sourceCollection)
-	return &DBRepositories{
+	return DBRepositories{
 		Season: seasonRepository,
 		Source: sourceRepository,
 	}
