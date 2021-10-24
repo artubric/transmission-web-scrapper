@@ -2,4 +2,7 @@ module transmission-web-scrapper
 
 go 1.16
 
-require go.mongodb.org/mongo-driver v1.7.3 // indirect
+require (
+	github.com/joho/godotenv v1.4.0
+	go.mongodb.org/mongo-driver v1.7.3
+)

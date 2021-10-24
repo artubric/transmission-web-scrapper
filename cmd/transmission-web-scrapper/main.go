@@ -8,12 +8,12 @@ import (
 
 func main() {
 	// fetch config
-	config := config.GetConfig()
+	config := config.Load()
 
 	// initiate connection to DB
-	dbClient := db.Connect(config.DBConfig)
+	dbRepositories := db.Connect(config.DBConfig)
 
 	// bring up rest APIs
-	server := server.New(config.ServerConfig, dbClient)
+	server := server.New(config.ServerConfig, dbRepositories)
 	server.Run()
 }
