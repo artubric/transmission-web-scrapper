@@ -12,20 +12,36 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func Connect(config config.DBConfig) *mongo.Client {
+const (
+	dBName               = "TransmissionWebScrapper"
+	seasonCollectionName = "Season"
+	sourceCollectionName = "Source"
+	timeout              = 10 * time.Second
+)
+
+type DBRepositories struct {
+	Season SeasonRepository
+	Source DataSourceRepository
+}
+
+func Connect(config config.DBConfig) *DBRepositories {
 	log.Println("Connecting to db...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.URI))
 	if err != nil {
 		log.Fatal("Failed to connect to DB with %+w", err)
 	}
 	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		log.Fatal("Failed to connect to DB with %+w", err)
 	}
-
-	log.Println("Done")
-
-	return client
+	seasonCollection := client.Database(dBName).Collection(seasonCollectionName)
+	sourceCollection := client.Database(dBName).Collection(sourceCollectionName)
+	seasonRepository := NewSeasonRepository(seasonCollection)
+	sourceRepository := NewDataSourceRepository(sourceCollection)
+	return &DBRepositories{
+		Season: seasonRepository,
+		Source: sourceRepository,
+	}
 }
