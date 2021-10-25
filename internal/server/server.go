@@ -5,20 +5,22 @@ import (
 	"log"
 	"net/http"
 	"transmission-web-scrapper/config"
-	"transmission-web-scrapper/internal/db"
+	"transmission-web-scrapper/internal/service"
 )
 
 type Server struct {
-	config  config.ServerConfig
-	dbRepos *db.DBRepositories
+	config            config.ServerConfig
+	seasonService     *service.SeasonService
+	dataSourceService *service.DataSourceService
 }
 
 type handlerFunc func(w http.ResponseWriter, r *http.Request)
 
-func New(conf config.ServerConfig, dbRepos *db.DBRepositories) Server {
+func New(conf config.ServerConfig, seasonService *service.SeasonService, dataSourceService *service.DataSourceService) Server {
 	return Server{
-		config:  conf,
-		dbRepos: dbRepos,
+		config:            conf,
+		seasonService:     seasonService,
+		dataSourceService: dataSourceService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (s Server) Run() {
 func (s *Server) setupRoutes() {
 	newRoute(s.config.ApiBasePath, "v1", "season", s.seasonRouteHandler)
 	newRoute(s.config.ApiBasePath, "v1", "data-source", s.dataSourceRouteHandler)
+	newRoute(s.config.ApiBasePath, "v1", "data-source/", s.dataSourceRouteHandlerByID)
 	newRoute(s.config.ApiBasePath, "v1", "scraper", s.scraperRouteHandler)
 }
 
