@@ -47,7 +47,7 @@ func (dsr DataSourceRepositoryImpl) GetAll(ctx context.Context) ([]DataSource, e
 	if err != nil {
 		return fetchedDataSource, err
 	}
-	if err := result.Decode(&fetchedDataSource); err != nil {
+	if err := result.All(ctx, &fetchedDataSource); err != nil {
 		return fetchedDataSource, err
 	}
 

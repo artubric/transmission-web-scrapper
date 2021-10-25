@@ -47,7 +47,7 @@ func (sr SeasonRepositoryImpl) GetAll(ctx context.Context) ([]Season, error) {
 	if err != nil {
 		return fetchedSeason, err
 	}
-	if err := result.Decode(&fetchedSeason); err != nil {
+	if err := result.All(ctx, &fetchedSeason); err != nil {
 		return fetchedSeason, err
 	}
 
