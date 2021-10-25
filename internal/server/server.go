@@ -33,6 +33,7 @@ func (s Server) Run() {
 
 func (s *Server) setupRoutes() {
 	newRoute(s.config.ApiBasePath, "v1", "season", s.seasonRouteHandler)
+	newRoute(s.config.ApiBasePath, "v1", "season/", s.seasonRouteHandlerByID)
 	newRoute(s.config.ApiBasePath, "v1", "data-source", s.dataSourceRouteHandler)
 	newRoute(s.config.ApiBasePath, "v1", "data-source/", s.dataSourceRouteHandlerByID)
 	newRoute(s.config.ApiBasePath, "v1", "scraper", s.scraperRouteHandler)

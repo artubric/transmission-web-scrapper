@@ -25,3 +25,7 @@ func (s Server) seasonRouteHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
+
+func (s Server) seasonRouteHandlerByID(w http.ResponseWriter, r *http.Request) {
+
+}
