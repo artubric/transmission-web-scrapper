@@ -55,8 +55,9 @@ func (dsr DataSourceRepositoryImpl) GetAll(ctx context.Context) ([]DataSource, e
 }
 
 func (dsr DataSourceRepositoryImpl) Update(ctx context.Context, s DataSource) (DataSource, error) {
+	var filter = bson.D{primitive.E{Key: "_id", Value: s.ID}}
 
-	if _, err := dsr.col.UpdateByID(ctx, s.ID, s); err != nil {
+	if _, err := dsr.col.ReplaceOne(ctx, filter, s); err != nil {
 		return DataSource{}, err
 	}
 

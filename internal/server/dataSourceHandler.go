@@ -70,8 +70,6 @@ func writeErrorJSON(w http.ResponseWriter, err error) {
 	if err != nil {
 		log.Printf("Error: %+v", err)
 	}
-	log.Printf("Error json: %+v", errorJSON)
-
 	w.Write(errorJSON)
 }
 
@@ -87,6 +85,7 @@ func unmarshalBody(w http.ResponseWriter, r *http.Request) (db.DataSource, error
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		writeErrorJSON(w, err)
 		log.Printf("Cannot parse the body: %+v\n", err)
 		return db.DataSource{}, err
 	}

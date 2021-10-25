@@ -55,8 +55,9 @@ func (sr SeasonRepositoryImpl) GetAll(ctx context.Context) ([]Season, error) {
 }
 
 func (sr SeasonRepositoryImpl) Update(ctx context.Context, s Season) (Season, error) {
+	var filter = bson.D{primitive.E{Key: "_id", Value: s.ID}}
 
-	if _, err := sr.col.UpdateByID(ctx, s.ID, s); err != nil {
+	if _, err := sr.col.ReplaceOne(ctx, filter, s); err != nil {
 		return Season{}, err
 	}
 
