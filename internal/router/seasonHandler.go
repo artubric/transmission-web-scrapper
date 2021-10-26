@@ -1,11 +1,11 @@
-package server
+package router
 
 import (
 	"io/ioutil"
 	"net/http"
 )
 
-func (s Server) scraperRouteHandler(w http.ResponseWriter, r *http.Request) {
+func (rt Router) seasonRouteHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -24,4 +24,8 @@ func (s Server) scraperRouteHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
+
+func (rt Router) seasonRouteHandlerByID(w http.ResponseWriter, r *http.Request) {
+
 }
