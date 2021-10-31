@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -94,6 +95,7 @@ func (sr SeasonRepositoryImpl) GetAllExpanded(ctx context.Context) ([]SeasonExpa
 
 func (sr SeasonRepositoryImpl) Update(ctx context.Context, s Season) (Season, error) {
 	var filter = bson.D{primitive.E{Key: "_id", Value: s.ID}}
+	s.LastUpdated = primitive.NewDateTimeFromTime(time.Now())
 
 	if _, err := sr.col.ReplaceOne(ctx, filter, s); err != nil {
 		return Season{}, err
@@ -105,6 +107,7 @@ func (sr SeasonRepositoryImpl) Update(ctx context.Context, s Season) (Season, er
 func (sr SeasonRepositoryImpl) Create(ctx context.Context, s Season) (Season, error) {
 
 	s.ID = primitive.NewObjectID()
+	s.LastUpdated = primitive.NewDateTimeFromTime(time.Now())
 	result, err := sr.col.InsertOne(ctx, s)
 	if err != nil {
 		return Season{}, err
