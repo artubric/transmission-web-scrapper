@@ -101,6 +101,8 @@ func doScraping(s db.SeasonExpanded) (string, error) {
 		var ok bool
 		if searchResult != nil {
 			magnetLink, ok = searchResult.Attr("href")
+		} else {
+			return "", fmt.Errorf("did not find requested episode")
 		}
 		if ok {
 			return magnetLink, nil

@@ -53,8 +53,13 @@ func (ts TorrentService) Add(magnetLink string, downloadDir string) error {
 	json.NewDecoder(resp.Body).Decode(&response)
 
 	if response.Id == "" {
-		log.Printf("failed to add request to transmission")
-		return fmt.Errorf("failed to add request to torrent server")
+		var err error
+		if response.HashString == "" {
+			err = fmt.Errorf("failed to add request to torrent server")
+		} else {
+			err = fmt.Errorf("torrent already exists. skip")
+		}
+		return err
 	}
 
 	return nil
