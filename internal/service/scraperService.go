@@ -44,7 +44,32 @@ func (ss ScraperService) Start(ctx context.Context) error {
 			if err = ss.torrent.Add(magnetLink, s.DownloadDir); err != nil {
 				return err
 			}
-			// update season entity in DB
+
+			if s.LastEpisode+1 >= s.TotalEpisodes {
+				s.LastEpisode = s.TotalEpisodes
+				s.IsArchived = true
+			} else {
+				s.LastEpisode++
+			}
+
+			updatedSeason := db.Season{
+				ID:            s.ID,
+				Name:          s.Name,
+				Season:        s.Season,
+				StartDate:     s.StartDate,
+				EndDate:       s.EndDate,
+				TotalEpisodes: s.TotalEpisodes,
+				LastEpisode:   s.LastEpisode,
+				Quality:       s.Quality,
+				DataSource:    s.DataSource.ID,
+				IsArchived:    s.IsArchived,
+				DownloadDir:   s.DownloadDir,
+			}
+			_, err = ss.season.Update(ctx, updatedSeason)
+			if err != nil {
+				return err
+			}
+			return nil
 		}
 	}
 
@@ -72,7 +97,11 @@ func doScraping(s db.SeasonExpanded) (string, error) {
 			}
 			return true
 		})
-		magnetLink, ok := searchResult.Attr("href")
+		var magnetLink string
+		var ok bool
+		if searchResult != nil {
+			magnetLink, ok = searchResult.Attr("href")
+		}
 		if ok {
 			return magnetLink, nil
 		} else {
