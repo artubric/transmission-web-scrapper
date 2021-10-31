@@ -10,8 +10,9 @@ import (
 )
 
 type Config struct {
-	DBConfig     DBConfig
-	ServerConfig ServerConfig
+	DBConfig            DBConfig
+	ServerConfig        ServerConfig
+	TorrentServerConfig TorrentServerConfig
 }
 
 type DBConfig struct {
@@ -20,6 +21,14 @@ type DBConfig struct {
 	Url      string
 	Port     string
 	URI      string
+}
+
+type TorrentServerConfig struct {
+	Protocol      string
+	Address       string
+	Port          string
+	Endpoint      string
+	AddTorrentURI string
 }
 
 type ServerConfig struct {
@@ -45,7 +54,19 @@ func Load() *Config {
 			Port:        envConfig["SERVER_PORT"],
 			ApiBasePath: "api",
 		},
+		TorrentServerConfig: TorrentServerConfig{
+			Protocol: envConfig["TORRENT_REST_PROTOCOL"],
+			Address:  envConfig["TORRENT_REST_SERVER"],
+			Port:     envConfig["TORRENT_REST_PORT"],
+			Endpoint: envConfig["TORRENT_REST_ENDPOINT"],
+		},
 	}
+	config.TorrentServerConfig.AddTorrentURI = fmt.Sprintf("%s://%s:%s/%s",
+		config.TorrentServerConfig.Protocol,
+		config.TorrentServerConfig.Address,
+		config.TorrentServerConfig.Port,
+		config.TorrentServerConfig.Endpoint,
+	)
 
 	config.DBConfig.URI = fmt.Sprintf("mongodb://%s:%s@%s:%s",
 		config.DBConfig.Username,

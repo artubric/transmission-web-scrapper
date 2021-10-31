@@ -18,9 +18,11 @@ func main() {
 	// services
 	sourceService := service.NewDataSourceService(dbRepositories.Source)
 	seasonService := service.NewSeasonService(dbRepositories.Season)
+	torrentService := service.NewTorrentService(config.TorrentServerConfig)
+	scraperService := service.NewScraperService(dbRepositories.Season, config.TorrentServerConfig, torrentService)
 
 	// router
-	router := router.New(sourceService, seasonService)
+	router := router.New(sourceService, seasonService, scraperService)
 
 	// bring up rest APIs
 	server := server.New(config.ServerConfig, router)

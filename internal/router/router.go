@@ -10,14 +10,16 @@ import (
 type Router struct {
 	seasonService     service.SeasonService
 	dataSourceService service.DataSourceService
+	scraperService    service.ScraperService
 }
 
 type handlerFunc func(w http.ResponseWriter, r *http.Request)
 
-func New(dss service.DataSourceService, ss service.SeasonService) Router {
+func New(dataSourceService service.DataSourceService, seasonService service.SeasonService, scraperService service.ScraperService) Router {
 	return Router{
-		seasonService:     ss,
-		dataSourceService: dss,
+		seasonService:     seasonService,
+		dataSourceService: dataSourceService,
+		scraperService:    scraperService,
 	}
 }
 

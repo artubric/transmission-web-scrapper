@@ -16,6 +16,7 @@ type Season struct {
 	Quality       string             `json:"quality" bson:"quality"`
 	DataSource    primitive.ObjectID `json:"dataSource" bson:"dataSource"`
 	IsArchived    bool               `json:"isArchived" bson:"isArchived"`
+	DownloadDir   string             `json:"downloadDir" bson:"downloadDir"`
 }
 
 type SeasonExpanded struct {
@@ -30,6 +31,7 @@ type SeasonExpanded struct {
 	Quality       string             `json:"quality"`
 	DataSource    DataSource         `json:"dataSource"`
 	IsArchived    bool               `json:"isArchived"`
+	DownloadDir   string             `json:"downloadDir" bson:"downloadDir"`
 }
 
 type DataSource struct {
