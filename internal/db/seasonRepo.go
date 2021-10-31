@@ -14,6 +14,7 @@ type SeasonRepository interface {
 	Get(context.Context, primitive.ObjectID) (Season, error)
 	Update(context.Context, Season) (Season, error)
 	GetAll(context.Context) ([]Season, error)
+	GetAllExpanded(context.Context) ([]SeasonExpanded, error)
 }
 
 type SeasonRepositoryImpl struct {
@@ -41,12 +42,49 @@ func (sr SeasonRepositoryImpl) Get(ctx context.Context, id primitive.ObjectID) (
 
 func (sr SeasonRepositoryImpl) GetAll(ctx context.Context) ([]Season, error) {
 	var fetchedSeason []Season
-	var filter = bson.D{}
+	filter := bson.D{}
 
 	result, err := sr.col.Find(ctx, filter)
 	if err != nil {
 		return fetchedSeason, err
 	}
+
+	if err := result.All(ctx, &fetchedSeason); err != nil {
+		return fetchedSeason, err
+	}
+
+	return fetchedSeason, nil
+}
+
+func (sr SeasonRepositoryImpl) GetAllExpanded(ctx context.Context) ([]SeasonExpanded, error) {
+	var fetchedSeason []SeasonExpanded
+	lookupStage := bson.D{primitive.E{
+		Key: "$lookup",
+		Value: bson.D{
+			primitive.E{
+				Key:   "from",
+				Value: "Source",
+			}, primitive.E{
+				Key:   "localField",
+				Value: "dataSource",
+			}, primitive.E{
+				Key:   "foreignField",
+				Value: "_id",
+			}, primitive.E{
+				Key:   "as",
+				Value: "dataSource",
+			},
+		},
+	}}
+	unwindStage := bson.D{primitive.E{Key: "$unwind", Value: "$dataSource"}}
+
+	result, err := sr.col.Aggregate(ctx, mongo.Pipeline{
+		lookupStage, unwindStage,
+	})
+	if err != nil {
+		return fetchedSeason, err
+	}
+
 	if err := result.All(ctx, &fetchedSeason); err != nil {
 		return fetchedSeason, err
 	}
