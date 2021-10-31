@@ -12,9 +12,10 @@ import (
 )
 
 func (rt Router) writeErrorJSON(w http.ResponseWriter, err error) {
+	log.Printf("Failed with: %+v", err)
 	errorJSON, err := json.Marshal(err)
 	if err != nil {
-		log.Printf("Error: %+v", err)
+		log.Printf("Error while marshalling error: %+v", err)
 	}
 	w.Write(errorJSON)
 }
@@ -82,18 +83,17 @@ func (rt Router) marshalObject(i interface{}) ([]byte, error) {
 func (rt Router) handleResult(i interface{}, err error, w http.ResponseWriter) {
 	if err != nil {
 		log.Printf("Failed with: %+v\n", err)
-		rt.writeErrorJSON(w, err)
 		w.WriteHeader(http.StatusBadRequest)
+		rt.writeErrorJSON(w, err)
 		return
 	}
 	jsonResponse, err := rt.marshalObject(i)
 	if err != nil {
-		rt.writeErrorJSON(w, err)
 		w.WriteHeader(http.StatusBadRequest)
+		rt.writeErrorJSON(w, err)
 		return
 	}
 	w.Write(jsonResponse)
-	w.WriteHeader(http.StatusOK)
 }
 
 func (rt Router) getPathParam(path string) (primitive.ObjectID, error) {
