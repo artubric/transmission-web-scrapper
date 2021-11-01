@@ -49,8 +49,8 @@ func (s SeasonService) GetSeason(ctx context.Context, id primitive.ObjectID) (db
 	return result, nil
 }
 
-func (s SeasonService) GetAllSeason(ctx context.Context) ([]db.Season, error) {
-	result, err := s.repo.GetAll(ctx)
+func (s SeasonService) GetAllSeason(ctx context.Context, expandSource bool) ([]db.Season, error) {
+	result, err := s.repo.GetAll(ctx, expandSource)
 	if err != nil {
 		return []db.Season{}, err
 	}

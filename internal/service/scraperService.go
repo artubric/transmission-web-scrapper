@@ -29,7 +29,7 @@ func NewScraperService(repo db.SeasonRepository, conf config.TorrentServerConfig
 
 func (ss ScraperService) Start(ctx context.Context) error {
 	now := time.Now()
-	allSeasons, err := ss.season.GetAllExpanded(ctx)
+	allSeasons, err := ss.season.GetAll(ctx, true)
 	if err != nil {
 		return err
 	}
@@ -37,12 +37,14 @@ func (ss ScraperService) Start(ctx context.Context) error {
 		if !s.IsArchived &&
 			now.After(s.StartDate.Time()) &&
 			now.Before(s.EndDate.Time()) {
-			magnetLink, err := doScraping(s)
+			magnetLink, err := scrapForMagnetLink(s)
 			if err != nil {
-				return err
+				log.Println(err)
+				continue
 			}
 			if err = ss.torrent.Add(magnetLink, s.DownloadDir); err != nil {
-				return err
+				log.Println(err)
+				continue
 			}
 
 			if s.LastEpisode+1 >= s.TotalEpisodes {
@@ -51,36 +53,27 @@ func (ss ScraperService) Start(ctx context.Context) error {
 			} else {
 				s.LastEpisode++
 			}
-
-			updatedSeason := db.Season{
-				ID:            s.ID,
-				Name:          s.Name,
-				Season:        s.Season,
-				StartDate:     s.StartDate,
-				EndDate:       s.EndDate,
-				TotalEpisodes: s.TotalEpisodes,
-				LastEpisode:   s.LastEpisode,
-				Quality:       s.Quality,
-				DataSource:    s.DataSource.ID,
-				IsArchived:    s.IsArchived,
-				DownloadDir:   s.DownloadDir,
-			}
-			_, err = ss.season.Update(ctx, updatedSeason)
+			_, err = ss.season.Update(ctx, s)
 			if err != nil {
-				return err
+				log.Println(err)
+				continue
 			}
-			return nil
 		}
 	}
 
 	return nil
 }
 
-func doScraping(s db.SeasonExpanded) (string, error) {
+func scrapForMagnetLink(s db.Season) (string, error) {
 	switch s.DataSource.SourceType {
 	case "nyaa.si":
-		// TODO: generate string from config
-		url := fmt.Sprintf("https://nyaa.si/?f=0&c=1_2&q=%s+%s+s%02de%02d&s=seeders&o=desc", s.Name, s.Quality, s.Season, s.LastEpisode+1)
+		url := fmt.Sprintf("%s%s+%s+s%02de%02d%s",
+			s.DataSource.Link,
+			s.Name,
+			s.Quality,
+			s.Season,
+			s.LastEpisode+1,
+			s.DataSource.Parameters)
 		log.Printf("Fetching html via URL: %s\n", url)
 
 		document, err := getHTMLpage(url)

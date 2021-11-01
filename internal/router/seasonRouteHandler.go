@@ -8,7 +8,7 @@ import (
 func (rt Router) seasonRouteHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		result, err := rt.seasonService.GetAllSeason(r.Context())
+		result, err := rt.seasonService.GetAllSeason(r.Context(), false)
 		rt.handleResult(result, err, w)
 	case http.MethodPut:
 		season, err := rt.unmarshalBodyToSeason(w, r)
