@@ -16,7 +16,7 @@ type addTorrentRequest struct {
 
 type addTorrentResponse struct {
 	HashString string `json:"hashString"`
-	Id         string `json:"id"`
+	Id         int64  `json:"id"`
 	Name       string `json:"name"`
 }
 
@@ -52,15 +52,12 @@ func (ts TorrentService) Add(magnetLink string, downloadDir string) error {
 	response := addTorrentResponse{}
 	json.NewDecoder(resp.Body).Decode(&response)
 
-	if response.Id == "" {
-		var err error
-		if response.HashString == "" {
-			err = fmt.Errorf("failed to add request to torrent server")
-		} else {
-			err = fmt.Errorf("torrent already exists. skip")
-		}
+	if response.HashString == "" {
+		err := fmt.Errorf("failed to add request to torrent server")
 		return err
 	}
+
+	log.Printf("added torrent: %+v\n", response.Name)
 
 	return nil
 }
