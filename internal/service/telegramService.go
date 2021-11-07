@@ -1,8 +1,8 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"transmission-web-scrapper/config"
 )
@@ -12,8 +12,8 @@ const (
 )
 
 type telegramResponse struct {
-	Ok               bool   `json:"ok"`
-	ErrorDescription string `json:"description"`
+	Ok               bool    `json:"ok"`
+	ErrorDescription *string `json:"description"`
 }
 
 type TelegramService struct {
@@ -33,24 +33,18 @@ func (ts *TelegramService) SendMessage(message string) error {
 		parseMode,
 		message,
 	)
-	log.Printf("Telegram notification url: \n %s", url)
-	_, err := http.Get(url)
+	resp, err := http.Get(url)
 
 	if err != nil {
 		return err
 	}
 
-	// TODO:
-	// for some reason response is not parsing correctly, "ok" values always defaults to "false"
-	/*
-		response := telegramResponse{}
-		json.NewDecoder(resp.Body).Decode(&response)
-		log.Printf("Parsed response: %+v", response)
+	response := telegramResponse{}
+	json.NewDecoder(resp.Body).Decode(&response)
 
-		if !response.Ok {
-			return fmt.Errorf(response.ErrorDescription)
-		}
-	*/
+	if !response.Ok {
+		return fmt.Errorf(*response.ErrorDescription)
+	}
 
 	return nil
 
