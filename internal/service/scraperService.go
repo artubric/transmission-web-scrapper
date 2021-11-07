@@ -116,7 +116,15 @@ func scrapForMagnetLink(s db.Season) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		searchResult := document.Find("a.magnet").First()
+		var searchResult *goquery.Selection
+		numberOfElements := document.Find("tr.forum_header_border").Length()
+		// eztv feature: if search found no torrents, it returns latest 50 torrents on first page
+		if numberOfElements == 50 {
+			searchResult = nil
+		} else {
+			searchResult = document.Find("a.magnet").First()
+		}
+
 		return getMagnetLinkFromAnchor(searchResult)
 	default:
 		return "", fmt.Errorf("unknown source type: %s", s.DataSource.SourceType)
