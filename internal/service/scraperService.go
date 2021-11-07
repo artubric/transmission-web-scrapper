@@ -49,12 +49,12 @@ func (ss ScraperService) Start(ctx context.Context) error {
 				continue
 			}
 
-			telegramMessage := fmt.Sprintf("Added %s s%02de%02d",
-				s.Name,
-				s.Season,
-				s.LastEpisode+1)
-
 			if ss.telegram != nil {
+				telegramMessage := fmt.Sprintf("Added %s s%02de%02d",
+					s.Name,
+					s.Season,
+					s.LastEpisode+1)
+
 				if err := ss.telegram.SendMessage(telegramMessage); err != nil {
 					log.Printf("Failed to send notification to telegram with: %v\n", err)
 				}
