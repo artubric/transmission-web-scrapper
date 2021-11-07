@@ -103,18 +103,21 @@ func scrapForMagnetLink(s db.Season) (string, error) {
 			}
 			return true
 		})
-		var magnetLink string
-		var ok bool
-		if searchResult != nil {
-			magnetLink, ok = searchResult.Attr("href")
-		} else {
-			return "", fmt.Errorf("did not find requested episode")
+		return getMagnetLinkFromAnchor(searchResult)
+	case "eztv":
+		url := fmt.Sprintf("%s%s-%s-s%02de%02d",
+			s.DataSource.Link,
+			s.Name,
+			s.Quality,
+			s.Season,
+			s.LastEpisode+1)
+		log.Printf("Fetching html via URL: %s\n", url)
+		document, err := getHTMLpage(url)
+		if err != nil {
+			return "", err
 		}
-		if ok {
-			return magnetLink, nil
-		} else {
-			return "", fmt.Errorf("error extracting href tag")
-		}
+		searchResult := document.Find("a.magnet").First()
+		return getMagnetLinkFromAnchor(searchResult)
 	default:
 		return "", fmt.Errorf("unknown source type: %s", s.DataSource.SourceType)
 	}
@@ -139,4 +142,19 @@ func getHTMLpage(url string) (*goquery.Document, error) {
 	}
 
 	return doc, nil
+}
+
+func getMagnetLinkFromAnchor(anchor *goquery.Selection) (string, error) {
+	var magnetLink string
+	var ok bool
+	if anchor != nil {
+		magnetLink, ok = anchor.Attr("href")
+	} else {
+		return "", fmt.Errorf("did not find requested episode")
+	}
+	if ok {
+		return magnetLink, nil
+	} else {
+		return "", fmt.Errorf("error extracting href tag")
+	}
 }
