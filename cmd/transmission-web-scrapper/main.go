@@ -16,10 +16,13 @@ func main() {
 	dbRepositories := db.Connect(config.DBConfig)
 
 	// services
+	var telegramService *service.TelegramService
+	if config.TelegramServiceConfig.Enabled {
+		telegramService = service.NewTelegramService(config.TelegramServiceConfig)
+	}
 	sourceService := service.NewDataSourceService(dbRepositories.Source)
 	seasonService := service.NewSeasonService(dbRepositories.Season)
 	torrentService := service.NewTorrentService(config.TorrentServerConfig)
-	telegramService := service.NewTelegramService(config.TelegramServiceConfig)
 	scraperService := service.NewScraperService(dbRepositories.Season, config.TorrentServerConfig, torrentService, telegramService)
 
 	// router

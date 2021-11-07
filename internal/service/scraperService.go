@@ -17,10 +17,10 @@ type ScraperService struct {
 	season   db.SeasonRepository
 	config   config.TorrentServerConfig
 	torrent  TorrentService
-	telegram TelegramService
+	telegram *TelegramService
 }
 
-func NewScraperService(repo db.SeasonRepository, conf config.TorrentServerConfig, torrent TorrentService, telegram TelegramService) ScraperService {
+func NewScraperService(repo db.SeasonRepository, conf config.TorrentServerConfig, torrent TorrentService, telegram *TelegramService) ScraperService {
 	return ScraperService{
 		season:   repo,
 		config:   conf,
@@ -54,8 +54,10 @@ func (ss ScraperService) Start(ctx context.Context) error {
 				s.Season,
 				s.LastEpisode+1)
 
-			if err := ss.telegram.SendMessage(telegramMessage); err != nil {
-				log.Printf("Failed to send notification to telegram with: %v\n", err)
+			if ss.telegram != nil {
+				if err := ss.telegram.SendMessage(telegramMessage); err != nil {
+					log.Printf("Failed to send notification to telegram with: %v\n", err)
+				}
 			}
 
 			if s.LastEpisode+1 >= s.TotalEpisodes {

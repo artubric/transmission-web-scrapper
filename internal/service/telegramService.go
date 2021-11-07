@@ -20,8 +20,8 @@ type TelegramService struct {
 	conf config.TelegramServiceConfig
 }
 
-func NewTelegramService(conf config.TelegramServiceConfig) TelegramService {
-	return TelegramService{
+func NewTelegramService(conf config.TelegramServiceConfig) *TelegramService {
+	return &TelegramService{
 		conf: conf,
 	}
 }

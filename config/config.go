@@ -35,6 +35,7 @@ type TorrentServerConfig struct {
 type TelegramServiceConfig struct {
 	ChatId   string
 	BotToken string
+	Enabled  bool
 }
 
 type ServerConfig struct {
@@ -69,6 +70,7 @@ func Load() *Config {
 		TelegramServiceConfig: TelegramServiceConfig{
 			ChatId:   envConfig["TELEGRAM_CHAT_ID"],
 			BotToken: envConfig["TELEGRAM_BOT_TOKEN"],
+			Enabled:  stringToBoolWithFallback(envConfig["TELEGRAM_ENABLE_NOTIFICATIONS"], false),
 		},
 	}
 	config.TorrentServerConfig.AddTorrentURI = fmt.Sprintf("%s://%s:%s/%s",
@@ -90,7 +92,7 @@ func Load() *Config {
 
 func getConfigSource() string {
 	var configSource string
-	isProduction := GetEnvBool("IS_PROD", false)
+	isProduction := getEnvBool("IS_PROD", false)
 	if isProduction {
 		configSource = "config/.env.prod"
 	} else {
@@ -99,14 +101,18 @@ func getConfigSource() string {
 	return configSource
 }
 
-func GetEnvBool(value string, fallback bool) bool {
+func getEnvBool(value string, fallback bool) bool {
 	envValue := os.Getenv(value)
 	if len(envValue) == 0 {
 		return fallback
 	}
-	valueBool, err := strconv.ParseBool(envValue)
+	return stringToBoolWithFallback(envValue, fallback)
+}
+
+func stringToBoolWithFallback(val string, fallback bool) bool {
+	valueBool, err := strconv.ParseBool(val)
 	if err != nil {
-		log.Printf("failed to parse string(%s) to bool with: %+v", value, err)
+		log.Printf("failed to parse string(%s) to bool with: %+v", val, err)
 		return fallback
 	}
 	return valueBool
