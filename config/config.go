@@ -12,7 +12,7 @@ import (
 type Config struct {
 	DBConfig              DBConfig
 	ServerConfig          ServerConfig
-	TorrentServerConfig   TorrentServerConfig
+	TransmissionConfig    TransmissionConfig
 	TelegramServiceConfig TelegramServiceConfig
 }
 
@@ -24,12 +24,11 @@ type DBConfig struct {
 	URI      string
 }
 
-type TorrentServerConfig struct {
-	Protocol      string
-	Address       string
-	Port          string
-	Endpoint      string
-	AddTorrentURI string
+type TransmissionConfig struct {
+	Url      string
+	Port     uint16
+	Username string
+	Password string
 }
 
 type TelegramServiceConfig struct {
@@ -61,11 +60,11 @@ func Load() *Config {
 			Port:        envConfig["SERVER_PORT"],
 			ApiBasePath: "api",
 		},
-		TorrentServerConfig: TorrentServerConfig{
-			Protocol: envConfig["TORRENT_REST_PROTOCOL"],
-			Address:  envConfig["TORRENT_REST_SERVER"],
-			Port:     envConfig["TORRENT_REST_PORT"],
-			Endpoint: envConfig["TORRENT_REST_ENDPOINT"],
+		TransmissionConfig: TransmissionConfig{
+			Username: envConfig["TRANSMISSION_USERNAME"],
+			Password: envConfig["TRANSMISSION_PASSWORD"],
+			Url:      envConfig["TRANSMISSION_SERVER"],
+			Port:     StringToUint16(envConfig["TRANSMISSION_PORT"]),
 		},
 		TelegramServiceConfig: TelegramServiceConfig{
 			ChatId:   envConfig["TELEGRAM_CHAT_ID"],
@@ -73,12 +72,6 @@ func Load() *Config {
 			Enabled:  stringToBoolWithFallback(envConfig["TELEGRAM_ENABLE_NOTIFICATIONS"], false),
 		},
 	}
-	config.TorrentServerConfig.AddTorrentURI = fmt.Sprintf("%s://%s:%s/%s",
-		config.TorrentServerConfig.Protocol,
-		config.TorrentServerConfig.Address,
-		config.TorrentServerConfig.Port,
-		config.TorrentServerConfig.Endpoint,
-	)
 
 	config.DBConfig.URI = fmt.Sprintf("mongodb://%s:%s@%s:%s",
 		config.DBConfig.Username,
@@ -112,8 +105,16 @@ func getEnvBool(value string, fallback bool) bool {
 func stringToBoolWithFallback(val string, fallback bool) bool {
 	valueBool, err := strconv.ParseBool(val)
 	if err != nil {
-		log.Printf("failed to parse string(%s) to bool with: %+v", val, err)
+		log.Fatalf("failed to parse string(%s) to bool with: %+v", val, err)
 		return fallback
 	}
 	return valueBool
+}
+
+func StringToUint16(value string) uint16 {
+	uInt64, err := strconv.ParseUint(value, 10, 16)
+	if err != nil {
+		log.Fatalf("failed to convert string(%s) to uint16 with: %+v", value, err)
+	}
+	return uint16(uInt64)
 }

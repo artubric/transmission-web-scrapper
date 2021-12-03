@@ -7,25 +7,22 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"transmission-web-scrapper/config"
 	"transmission-web-scrapper/internal/db"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 type ScraperService struct {
-	season   db.SeasonRepository
-	config   config.TorrentServerConfig
-	torrent  TorrentService
-	telegram *TelegramService
+	season      db.SeasonRepository
+	transmisson *TransmissionService
+	telegram    *TelegramService
 }
 
-func NewScraperService(repo db.SeasonRepository, conf config.TorrentServerConfig, torrent TorrentService, telegram *TelegramService) ScraperService {
+func NewScraperService(repo db.SeasonRepository, transmisson *TransmissionService, telegram *TelegramService) ScraperService {
 	return ScraperService{
-		season:   repo,
-		config:   conf,
-		torrent:  torrent,
-		telegram: telegram,
+		season:      repo,
+		transmisson: transmisson,
+		telegram:    telegram,
 	}
 }
 
@@ -44,7 +41,8 @@ func (ss ScraperService) Start(ctx context.Context) error {
 				log.Println(err)
 				continue
 			}
-			if err = ss.torrent.Add(magnetLink, s.DownloadDir); err != nil {
+			_, err = ss.transmisson.AddTorrent(context.Background(), s.DownloadDir, magnetLink)
+			if err != nil {
 				log.Println(err)
 				continue
 			}

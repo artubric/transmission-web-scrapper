@@ -22,8 +22,8 @@ func main() {
 	}
 	sourceService := service.NewDataSourceService(dbRepositories.Source)
 	seasonService := service.NewSeasonService(dbRepositories.Season)
-	torrentService := service.NewTorrentService(config.TorrentServerConfig)
-	scraperService := service.NewScraperService(dbRepositories.Season, config.TorrentServerConfig, torrentService, telegramService)
+	transmissionService := service.NewTransmissionService(config.TransmissionConfig)
+	scraperService := service.NewScraperService(dbRepositories.Season, transmissionService, telegramService)
 
 	// router
 	router := router.New(sourceService, seasonService, scraperService)
