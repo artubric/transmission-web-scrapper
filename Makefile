@@ -7,7 +7,7 @@ BUILD_ARCH_TARGET = $(shell go env GOARCH)
 
 # build local executable
 build-local:
-	go build -o bin/${COMPILE_NAME} cmd/transmission-rest/main.go
+	go build -o bin/${COMPILE_NAME} cmd/transmission-web-scrapper/main.go
 
 # build docker image (for local use)
 build-docker-image: set-docker-tag
