@@ -91,17 +91,37 @@ func scrapForMagnetLink(s db.Season) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		var searchResult *goquery.Selection
-		anchorTags := document.Find("td.text-center").First().Find("a")
-		anchorTags.EachWithBreak(func(i int, anchor *goquery.Selection) bool {
-			href, found := anchor.Attr("href")
-			if found && strings.Contains(href, "magnet:") {
-				searchResult = anchor
+		var foundAnchor *goquery.Selection
+		var foundRow *goquery.Selection
+		searchRows := document.Find("tr.default")
+		searchRows.EachWithBreak(func(i int, searchRow *goquery.Selection) bool {
+			searchRow.Find("td").EachWithBreak(func(i int, searchColumn *goquery.Selection) bool {
+				colspan, found := searchColumn.Attr("colspan")
+				if found && colspan == "2" {
+					if !hasBadKodec(searchColumn.Text()) {
+						foundRow = searchRow
+						return false
+					}
+				}
+				return true
+			})
+			if foundRow != nil {
+				foundRow.Find("td.text-center").First().Find("a").EachWithBreak(func(i int, anchor *goquery.Selection) bool {
+					href, found := anchor.Attr("href")
+					if found && strings.Contains(href, "magnet:") {
+						foundAnchor = anchor
+						return false
+					}
+					return true
+				})
+			}
+			if foundAnchor != nil {
 				return false
 			}
 			return true
 		})
-		return getMagnetLinkFromAnchor(searchResult)
+
+		return getMagnetLinkFromAnchor(foundAnchor)
 	case "eztv":
 		url := fmt.Sprintf("%s%s-%s-s%02de%02d",
 			s.DataSource.Link,
@@ -163,4 +183,15 @@ func getMagnetLinkFromAnchor(anchor *goquery.Selection) (string, error) {
 	} else {
 		return "", fmt.Errorf("error extracting href tag")
 	}
+}
+
+func hasBadKodec(torrentTitle string) bool {
+	kodecsToIgnore := []string{"AV1"}
+	for _, badKodec := range kodecsToIgnore {
+		if strings.Contains(torrentTitle, badKodec) {
+			return true
+		}
+	}
+
+	return false
 }
