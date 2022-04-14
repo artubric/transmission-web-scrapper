@@ -19,7 +19,7 @@ type Season struct {
 
 func DbSeasonToDTO(s db.Season) Season {
 	return Season{
-		ID:            s.ID.String(),
+		ID:            s.ID.Hex(),
 		Name:          s.Name,
 		Season:        s.Season,
 		StartDate:     s.StartDate.Time().Format("2006-01-02T15:04:05"),
@@ -28,7 +28,7 @@ func DbSeasonToDTO(s db.Season) Season {
 		LastUpdated:   s.LastUpdated.Time().Format("2006-01-02T15:04:05"),
 		LastEpisode:   s.LastEpisode,
 		Quality:       s.Quality,
-		DataSourceId:  s.DataSourceId.String(),
+		DataSourceId:  s.DataSourceId.Hex(),
 		IsArchived:    s.IsArchived,
 		DownloadDir:   s.DownloadDir,
 	}
