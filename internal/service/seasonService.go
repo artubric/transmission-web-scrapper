@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"transmission-web-scrapper/internal/db"
+	"transmission-web-scrapper/internal/dto"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -49,10 +50,10 @@ func (s SeasonService) GetSeason(ctx context.Context, id primitive.ObjectID) (db
 	return result, nil
 }
 
-func (s SeasonService) GetAllSeason(ctx context.Context, expandSource bool) ([]db.Season, error) {
-	result, err := s.repo.GetAll(ctx, expandSource)
+func (s SeasonService) GetAllSeason(ctx context.Context, expandSource bool) ([]dto.Season, error) {
+	dbSeasons, err := s.repo.GetAll(ctx, expandSource)
 	if err != nil {
-		return []db.Season{}, err
+		return []dto.Season{}, err
 	}
-	return result, nil
+	return dto.DbSeasonsToDTO(dbSeasons), nil
 }
