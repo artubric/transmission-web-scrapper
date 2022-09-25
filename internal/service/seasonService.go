@@ -42,12 +42,12 @@ func (s SeasonService) DeleteSeason(ctx context.Context, id primitive.ObjectID) 
 	return nil
 }
 
-func (s SeasonService) GetSeason(ctx context.Context, id primitive.ObjectID) (db.Season, error) {
+func (s SeasonService) GetSeason(ctx context.Context, id primitive.ObjectID) (dto.Season, error) {
 	result, err := s.repo.Get(ctx, id)
 	if err != nil {
-		return db.Season{}, err
+		return dto.Season{}, err
 	}
-	return result, nil
+	return dto.DbSeasonToDTO(result), nil
 }
 
 func (s SeasonService) GetAllSeason(ctx context.Context, expandSource bool) ([]dto.Season, error) {
