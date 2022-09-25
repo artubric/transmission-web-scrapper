@@ -1,6 +1,12 @@
 package dto
 
-import "transmission-web-scrapper/internal/db"
+import (
+	"fmt"
+	"time"
+	"transmission-web-scrapper/internal/db"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Season struct {
 	ID            string `json:"id"`
@@ -15,6 +21,43 @@ type Season struct {
 	DataSourceId  string `json:"dataSourceId"`
 	IsArchived    bool   `json:"isArchived"`
 	DownloadDir   string `json:"downloadDir"`
+}
+
+func DTOSeasonToDB(s Season) (db.Season, error) {
+
+	dbId, err := primitive.ObjectIDFromHex(s.ID)
+	if err != nil {
+		return db.Season{}, fmt.Errorf("Failed to parse ID to primitive, %w", err)
+	}
+
+	dbDataSourceId, err := primitive.ObjectIDFromHex(s.DataSourceId)
+	if err != nil {
+		return db.Season{}, fmt.Errorf("Failed to parse DataSourceId to primitive, %w", err)
+	}
+
+	startTime, err := time.Parse("2006-01-02T15:04:05", s.StartDate)
+	if err != nil {
+		return db.Season{}, fmt.Errorf("Failed to parse StartDate to time, %w", err)
+	}
+
+	endTime, err := time.Parse("2006-01-02T15:04:05", s.EndDate)
+	if err != nil {
+		return db.Season{}, fmt.Errorf("Failed to parse EndDate to time, %w", err)
+	}
+	return db.Season{
+		ID:            dbId,
+		Name:          s.Name,
+		Season:        s.Season,
+		StartDate:     primitive.NewDateTimeFromTime(startTime),
+		EndDate:       primitive.NewDateTimeFromTime(endTime),
+		TotalEpisodes: s.TotalEpisodes,
+		LastUpdated:   primitive.NewDateTimeFromTime(time.Now()),
+		LastEpisode:   s.LastEpisode,
+		Quality:       s.Quality,
+		DataSourceId:  dbDataSourceId,
+		IsArchived:    s.IsArchived,
+		DownloadDir:   s.DownloadDir,
+	}, nil
 }
 
 func DbSeasonToDTO(s db.Season) Season {

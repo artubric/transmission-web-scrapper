@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"transmission-web-scrapper/internal/db"
+	"transmission-web-scrapper/internal/dto"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -29,11 +30,15 @@ func (rt Router) unmarshallDataSource(body []byte) (db.DataSource, error) {
 }
 
 func (rt Router) unmarshallSeason(body []byte) (db.Season, error) {
-	var season db.Season
-	if err := json.Unmarshal(body, &season); err != nil {
+	var dtoSeason dto.Season
+	if err := json.Unmarshal(body, &dtoSeason); err != nil {
 		return db.Season{}, err
 	}
-	return season, nil
+	dbSeason, err := dto.DTOSeasonToDB(dtoSeason)
+	if err != nil {
+		return db.Season{}, err
+	}
+	return dbSeason, nil
 }
 
 func (rt Router) unmarshalBodyToDataSource(w http.ResponseWriter, r *http.Request) (db.DataSource, error) {
