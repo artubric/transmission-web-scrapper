@@ -18,20 +18,20 @@ func NewSeasonService(repo db.SeasonRepository) SeasonService {
 	}
 }
 
-func (s SeasonService) CreateSeason(ctx context.Context, season db.Season) (db.Season, error) {
+func (s SeasonService) CreateSeason(ctx context.Context, season db.Season) (dto.Season, error) {
 	result, err := s.repo.Create(ctx, season)
 	if err != nil {
-		return db.Season{}, err
+		return dto.Season{}, err
 	}
-	return result, nil
+	return dto.DbSeasonToDTO(result), nil
 }
 
-func (s SeasonService) UpdateSeason(ctx context.Context, season db.Season) (db.Season, error) {
+func (s SeasonService) UpdateSeason(ctx context.Context, season db.Season) (dto.Season, error) {
 	result, err := s.repo.Update(ctx, season)
 	if err != nil {
-		return db.Season{}, err
+		return dto.Season{}, err
 	}
-	return result, nil
+	return dto.DbSeasonToDTO(result), nil
 }
 
 func (s SeasonService) DeleteSeason(ctx context.Context, id primitive.ObjectID) error {
