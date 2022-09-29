@@ -25,9 +25,15 @@ type Season struct {
 
 func DTOSeasonToDB(s Season) (db.Season, error) {
 
-	dbId, err := primitive.ObjectIDFromHex(s.ID)
-	if err != nil {
-		return db.Season{}, fmt.Errorf("Failed to parse ID to primitive, %w", err)
+	var dbId primitive.ObjectID
+	var err error
+	if s.ID == "add" {
+		dbId = primitive.NilObjectID
+	} else {
+		dbId, err = primitive.ObjectIDFromHex(s.ID)
+		if err != nil {
+			return db.Season{}, fmt.Errorf("Failed to parse ID to primitive, %w", err)
+		}
 	}
 
 	dbDataSourceId, err := primitive.ObjectIDFromHex(s.DataSourceId)
