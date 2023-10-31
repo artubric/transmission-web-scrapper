@@ -47,18 +47,24 @@ func (ss ScraperService) Start(ctx context.Context) error {
 				continue
 			}
 
+			isSeasonComplete := s.LastEpisode+1 >= s.TotalEpisodes
+
 			if ss.telegram != nil {
-				telegramMessage := fmt.Sprintf("Added %s s%02de%02d",
+				telegramMessage := fmt.Sprintf("≫ %s s%02de%02d",
 					s.Name,
 					s.Season,
 					s.LastEpisode+1)
+
+				if isSeasonComplete {
+					telegramMessage = fmt.Sprintf("%s.%s",telegramMessage, "\n✓ Season complete")
+				}
 
 				if err := ss.telegram.SendMessage(telegramMessage); err != nil {
 					log.Printf("Failed to send notification to telegram with: %v\n", err)
 				}
 			}
 
-			if s.LastEpisode+1 >= s.TotalEpisodes {
+			if isSeasonComplete {
 				s.LastEpisode = s.TotalEpisodes
 				s.IsArchived = true
 			} else {
@@ -143,6 +149,24 @@ func scrapForMagnetLink(s db.Season) (string, error) {
 			searchResult = document.Find("a.magnet").First()
 		}
 
+		return getMagnetLinkFromAnchor(searchResult)
+	case "torrentz2.nz":
+		url := fmt.Sprintf("%s%s-%s-s%02de%02d",
+			s.DataSource.Link,
+			s.Name,
+			s.Quality,
+			s.Season,
+			s.LastEpisode+1)
+
+		log.Printf("Fetching html via URL: %s\n", url)
+		
+		document, err := getHTMLpage(url)
+		if err != nil {
+			return "", err
+		}
+
+		searchResult := document.Find("dl dd span a").First()
+		
 		return getMagnetLinkFromAnchor(searchResult)
 	default:
 		return "", fmt.Errorf("unknown source type: %s", s.DataSource.SourceType)
