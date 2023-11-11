@@ -170,7 +170,7 @@ func scrapForMagnetLink(s db.Season) (string, error) {
 
 		href, found := anchor.Attr("href")
 		if found && strings.Contains(href, "magnet:") {
-			getMagnetLinkFromAnchor(anchor)
+			return getMagnetLinkFromAnchor(anchor)
 		}
 		
 		return getMagnetLinkFromAnchor(nil)
