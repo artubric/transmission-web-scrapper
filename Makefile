@@ -1,5 +1,5 @@
 APP_NAME = transmission-web-scrapper
-VERSION = 0.1.0
+VERSION = 0.1.1
 COMPILE_NAME = ${APP_NAME}-${VERSION}
 
 BUILD_OS_TARGET = $(shell go env GOOS)
