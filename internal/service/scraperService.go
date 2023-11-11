@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"html"
 	"log"
 	"net/http"
 	"strings"
@@ -58,8 +59,8 @@ func (ss ScraperService) Start(ctx context.Context) error {
 				if isSeasonComplete {
 					telegramMessage = fmt.Sprintf("%s.%s",telegramMessage, "\n✓ Season complete")
 				}
-
-				if err := ss.telegram.SendMessage(telegramMessage); err != nil {
+				
+				if err := ss.telegram.SendMessage(html.EscapeString(telegramMessage)); err != nil {
 					log.Printf("Failed to send notification to telegram with: %v\n", err)
 				}
 			}
@@ -165,9 +166,14 @@ func scrapForMagnetLink(s db.Season) (string, error) {
 			return "", err
 		}
 
-		searchResult := document.Find("dl dd span a").First()
+		anchor := document.Find("dl dd span a").First()
+
+		href, found := anchor.Attr("href")
+		if found && strings.Contains(href, "magnet:") {
+			getMagnetLinkFromAnchor(anchor)
+		}
 		
-		return getMagnetLinkFromAnchor(searchResult)
+		return getMagnetLinkFromAnchor(nil)
 	default:
 		return "", fmt.Errorf("unknown source type: %s", s.DataSource.SourceType)
 	}
@@ -197,16 +203,16 @@ func getHTMLpage(url string) (*goquery.Document, error) {
 func getMagnetLinkFromAnchor(anchor *goquery.Selection) (string, error) {
 	var magnetLink string
 	var ok bool
-	if anchor != nil {
-		magnetLink, ok = anchor.Attr("href")
-	} else {
+
+	if anchor == nil {
 		return "", fmt.Errorf("did not find requested episode")
 	}
-	if ok {
-		return magnetLink, nil
-	} else {
+
+	magnetLink, ok = anchor.Attr("href"); if !ok {
 		return "", fmt.Errorf("error extracting href tag")
 	}
+	
+	return magnetLink, nil
 }
 
 func hasBadKodec(torrentTitle string) bool {
