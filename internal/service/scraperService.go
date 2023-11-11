@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"html"
 	"log"
 	"net/http"
 	"strings"
@@ -57,10 +56,10 @@ func (ss ScraperService) Start(ctx context.Context) error {
 					s.LastEpisode+1)
 
 				if isSeasonComplete {
-					telegramMessage = fmt.Sprintf("%s.%s",telegramMessage, "\n✓ Season complete")
+					telegramMessage = fmt.Sprintf("%s.%s",telegramMessage, "%0A✓ Season complete")
 				}
 				
-				if err := ss.telegram.SendMessage(html.EscapeString(telegramMessage)); err != nil {
+				if err := ss.telegram.SendMessage(telegramMessage); err != nil {
 					log.Printf("Failed to send notification to telegram with: %v\n", err)
 				}
 			}
