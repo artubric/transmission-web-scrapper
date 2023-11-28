@@ -1,4 +1,4 @@
-APP_NAME = transmission-web-scrapper
+APP_NAME = tws
 VERSION = 0.1.4
 COMPILE_NAME = ${APP_NAME}-${VERSION}
 
