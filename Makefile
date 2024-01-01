@@ -1,5 +1,5 @@
 APP_NAME = tws
-VERSION = 0.1.4
+VERSION = 0.1.5
 COMPILE_NAME = ${APP_NAME}-${VERSION}
 
 BUILD_OS_TARGET = $(shell go env GOOS)

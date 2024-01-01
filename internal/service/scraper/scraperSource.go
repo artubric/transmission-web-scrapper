@@ -100,8 +100,8 @@ var SourceMap = map[string]func(s db.Season) (string, error) {
 		
 		// to avoid fake torrents; expected real one to be aploaded to multiple sources
 		resultsFound := document.Find("div.results dl").Length()
-		if resultsFound < 5 {
-			return "", fmt.Errorf("found less than 5 result, cutting off")
+		if resultsFound < 3 {
+			return "", fmt.Errorf("found less than 3 result, cutting off")
 		}
 
 		anchor := document.Find("div.results dl dd span a").First()
