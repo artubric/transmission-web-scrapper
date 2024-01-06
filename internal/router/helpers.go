@@ -2,7 +2,7 @@ package router
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -42,7 +42,7 @@ func (rt Router) unmarshallSeason(body []byte) (db.Season, error) {
 }
 
 func (rt Router) unmarshalBodyToDataSource(w http.ResponseWriter, r *http.Request) (db.DataSource, error) {
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		rt.writeErrorJSON(w, err)
@@ -60,7 +60,7 @@ func (rt Router) unmarshalBodyToDataSource(w http.ResponseWriter, r *http.Reques
 }
 
 func (rt Router) unmarshalBodyToSeason(w http.ResponseWriter, r *http.Request) (db.Season, error) {
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		rt.writeErrorJSON(w, err)
@@ -101,8 +101,12 @@ func (rt Router) handleResult(i interface{}, err error, w http.ResponseWriter) {
 	w.Write(jsonResponse)
 }
 
-func (rt Router) getPathParam(path string) (primitive.ObjectID, error) {
+func (rt Router) getPathParamHex(path string) (primitive.ObjectID, error) {
+	return primitive.ObjectIDFromHex(rt.getPathParamString(path))
+}
+
+func (rt Router) getPathParamString(path string) (string) {
 	pathSlice := strings.Split(path, "/")
 	inputId := pathSlice[len(pathSlice)-1]
-	return primitive.ObjectIDFromHex(inputId)
+	return inputId
 }

@@ -30,7 +30,7 @@ func (rt Router) seasonRouteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rt Router) seasonRouteHandlerByID(w http.ResponseWriter, r *http.Request) {
-	id, err := rt.getPathParam(r.URL.Path)
+	id, err := rt.getPathParamHex(r.URL.Path)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		log.Printf("Cannot parse the path param from(%s): %+v\n", r.URL.Path, err)

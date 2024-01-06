@@ -14,6 +14,7 @@ type Config struct {
 	ServerConfig          ServerConfig
 	TransmissionConfig    TransmissionConfig
 	TelegramServiceConfig TelegramServiceConfig
+	TmdbAPIConfig         TmdbAPIConfig
 }
 
 type DBConfig struct {
@@ -40,6 +41,10 @@ type TelegramServiceConfig struct {
 type ServerConfig struct {
 	Port        string
 	ApiBasePath string
+}
+
+type TmdbAPIConfig struct {
+	ApiKey string
 }
 
 func Load() *Config {
@@ -70,6 +75,9 @@ func Load() *Config {
 			ChatId:   envConfig["TELEGRAM_CHAT_ID"],
 			BotToken: envConfig["TELEGRAM_BOT_TOKEN"],
 			Enabled:  stringToBoolWithFallback(envConfig["TELEGRAM_ENABLE_NOTIFICATIONS"], false),
+		},
+		TmdbAPIConfig: TmdbAPIConfig{
+			ApiKey: envConfig["TMDB_API_KEY"],
 		},
 	}
 

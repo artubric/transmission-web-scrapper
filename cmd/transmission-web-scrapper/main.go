@@ -24,9 +24,10 @@ func main() {
 	seasonService := service.NewSeasonService(dbRepositories.Season)
 	transmissionService := service.NewTransmissionService(config.TransmissionConfig)
 	scraperService := service.NewScraperService(dbRepositories.Season, transmissionService, telegramService)
+	tmdbAPIService := service.NewTMDBService(config.TmdbAPIConfig)
 
 	// router
-	router := router.New(sourceService, seasonService, scraperService)
+	router := router.New(sourceService, seasonService, scraperService, tmdbAPIService)
 
 	// bring up rest APIs
 	server := server.New(config.ServerConfig, router)
