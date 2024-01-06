@@ -35,7 +35,6 @@ func (rt Router) tmdbTVShowHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		dataSourceId := r.URL.Query().Get("dataSourceId")
-		fmt.Println("dataSourceId: "+dataSourceId)
 		if len(dataSourceId) == 0 {
 			err := fmt.Errorf("dataSourceId query param is missing")
 			rt.handleResult(nil, err, w)
@@ -43,13 +42,12 @@ func (rt Router) tmdbTVShowHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		seasonNumberString := r.URL.Query().Get("seasonNumber")
-		fmt.Println("seasonNumberString: "+seasonNumberString)
-
 		if len(seasonNumberString) == 0 {
 			err := fmt.Errorf("seasonNumber query param is missing")
 			rt.handleResult(nil, err, w)
 			return
 		}
+		
 		seasonNumber, err := strconv.Atoi(seasonNumberString)
 		if err != nil {
 			rt.handleResult(nil, err, w)
