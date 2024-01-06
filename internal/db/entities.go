@@ -18,6 +18,7 @@ type Season struct {
 	DataSource    DataSource         `json:"dataSource" bson:"dataSource"`
 	IsArchived    bool               `json:"isArchived" bson:"isArchived"`
 	DownloadDir   string             `json:"downloadDir" bson:"downloadDir"`
+	ImdbId        string             `json:"imdbId" bson:"imdbId,omitempty"`
 }
 
 type DataSource struct {

@@ -13,6 +13,10 @@ import (
 var SourceMap = map[string]func(s db.Season) (string, error) {
 	//
 	"eztv" : func(s db.Season) (string, error){
+		if len(s.ImdbId) != 0 {
+			// TODO: fetch via API
+		}
+
 		url := fmt.Sprintf("%s%s-%s-s%02de%02d",
 			s.DataSource.Link,
 			s.Name,

@@ -31,8 +31,8 @@ func (rt Router) SetupRoutes(apiBasePath string) {
 	rt.newRoute(apiBasePath, "v1", "data-source", rt.dataSourceRouteHandler)
 	rt.newRoute(apiBasePath, "v1", "data-source/", rt.dataSourceRouteHandlerByID)
 	rt.newRoute(apiBasePath, "v1", "scraper", rt.scraperRouteHandler)
-	rt.newRoute(apiBasePath, "v1", "tv-show/search", rt.tmdbSearchHandler)
-	rt.newRoute(apiBasePath, "v1", "tv-show/", rt.tmdbGetTVShow)
+	rt.newRoute(apiBasePath, "v1", "tv-show/search", rt.tmdbTVShowSearchHandler)
+	rt.newRoute(apiBasePath, "v1", "tv-show/", rt.tmdbTVShowHandler)
 
 }
 

@@ -21,6 +21,7 @@ type Season struct {
 	DataSourceId  string `json:"dataSourceId"`
 	IsArchived    bool   `json:"isArchived"`
 	DownloadDir   string `json:"downloadDir"`
+	ImdbId        string `json:"imdbId"`
 }
 
 func DTOSeasonToDB(s Season) (db.Season, error) {
@@ -63,6 +64,7 @@ func DTOSeasonToDB(s Season) (db.Season, error) {
 		DataSourceId:  dbDataSourceId,
 		IsArchived:    s.IsArchived,
 		DownloadDir:   s.DownloadDir,
+		ImdbId:        s.ImdbId,
 	}, nil
 }
 
@@ -80,6 +82,7 @@ func DbSeasonToDTO(s db.Season) Season {
 		DataSourceId:  s.DataSourceId.Hex(),
 		IsArchived:    s.IsArchived,
 		DownloadDir:   s.DownloadDir,
+		ImdbId:        s.ImdbId,
 	}
 }
 
