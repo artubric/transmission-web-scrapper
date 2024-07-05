@@ -44,5 +44,12 @@ func (rt Router) newRoute(basePath string, apiVersion string, entityName string,
 	)
 
 	log.Println("Registering listener for ", urlPath)
-	http.Handle(urlPath, http.HandlerFunc(hf))
+	http.Handle(urlPath, rt.logMiddleware(http.HandlerFunc(hf)))
+}
+
+func (rt Router) logMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.Method, r.URL.String())
+		h.ServeHTTP(w, r)
+	})
 }

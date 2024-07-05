@@ -15,6 +15,10 @@ func (rt Router) tmdbTVShowSearchHandler(w http.ResponseWriter, r *http.Request)
 	switch r.Method {
 	case http.MethodGet:
 		searchQuery := r.URL.Query().Get("searchQuery")
+		if len(searchQuery) == 0 {
+			err := fmt.Errorf("empty 'searchQuery' query parameter")
+			rt.handleResult(tmdb.SearchTVShowsResults{}, err, w)
+		}
 		result, err := rt.tmdbAPIService.SearchTVShow(searchQuery)
 		rt.handleResult(result, err, w)
 	default:
@@ -47,7 +51,7 @@ func (rt Router) tmdbTVShowHandler(w http.ResponseWriter, r *http.Request) {
 			rt.handleResult(nil, err, w)
 			return
 		}
-		
+
 		seasonNumber, err := strconv.Atoi(seasonNumberString)
 		if err != nil {
 			rt.handleResult(nil, err, w)
